@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>乐器分离 · 扒谱试听</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f4f0;color:#23332d;font:15px/1.6 system-ui,-apple-system,sans-serif}main{max-width:1050px;margin:auto;padding:40px 24px}h1{font-size:30px;margin:0 0 8px}p{margin:0 0 15px}.muted{color:#69756d}.layout{display:grid;grid-template-columns:310px 1fr;gap:24px;margin-top:26px}.panel{background:white;border:1px solid #e1e6df;border-radius:18px;padding:23px}.tracks{max-height:660px;overflow:auto}.group{font-size:12px;color:#69756d;margin:18px 0 8px;letter-spacing:.05em}.group:first-child{margin-top:0}button{font:inherit;cursor:pointer;border:1px solid #dae3db;border-radius:9px;padding:9px 13px;background:white;color:inherit}button:hover{background:#f2f6f0}button.active{background:#e3eedf;border-color:#89aa80}.track{display:block;width:100%;text-align:left;margin:6px 0}.tag{font-size:11px;color:#a36b35;margin-left:5px}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}h2{font-size:23px;margin:0 0 10px}audio{width:100%;margin:16px 0 6px}.readout{font-variant-numeric:tabular-nums;font-size:13px;color:#607063}.loop{margin-top:28px;border-top:1px solid #e5eae3;padding-top:16px}a{color:#3e734d;text-decoration:none}a:hover{text-decoration:underline}.download{display:flex;gap:20px;margin-top:22px}.note{font-size:13px;color:#677266;background:#f5f7f2;border-radius:10px;padding:12px;margin-top:20px}.fine{font-size:12px;color:#738078;margin-top:26px}.speed{display:flex;align-items:center;gap:10px}select{font:inherit;padding:7px;border-radius:7px;border:1px solid #dae3db}footer{margin-top:26px;font-size:13px;color:#69756d}@media(max-width:720px){main{padding:24px 16px}.layout{grid-template-columns:1fr}.tracks{max-height:260px}}
+</style>
+<main>
+<p class="muted">LOCAL AUDIO LAB · 45 秒片段</p><h1>乐器分离 · 扒谱试听</h1>
+<p class="muted">原视频 00:45–01:30。选择一条音轨，在相同位置对比原始与增强，降速或循环听清音符。</p>
+<div class="layout"><nav class="panel tracks" id="tracks" aria-label="选择音轨"></nav>
+<section class="panel"><p class="muted" id="group"></p><h2 id="title"></h2><p class="muted" id="source"></p>
+<div class="controls" aria-label="音频版本"><button id="raw">原始分轨</button><button id="enhanced" class="active">增强试听</button></div>
+<audio id="audio" controls preload="metadata"></audio>
+<div class="readout" id="readout">对应原视频 00:45.0</div>
+<div class="controls speed"><label for="speed">速度 · 保持音高</label><select id="speed"><option value="1">1.0 ×</option><option value="0.75">0.75 ×</option><option value="0.5">0.5 ×</option></select><button id="back">回退 3 秒</button></div>
+<div class="loop"><p>片段循环</p><div class="controls"><button id="markA">设起点 A</button><button id="markB">设终点 B</button><button id="loop">开启循环</button><button id="clearLoop">重置</button></div><p class="readout" id="loopText">A 00:00.0 → B 00:45.0</p></div>
+<div class="download"><a id="download" download>下载当前原速 MP3</a></div>
+<div class="note" id="note"></div><p class="fine">原始分轨在播放器中只做电平匹配，便于公平对比；未经处理的估计分轨见无损包。增强使用适度 EQ 和有限电平提升，保持原音高。强弱残留仍可能影响扒谱。</p>
+</section></div>
+<footer>钢琴、鼓件等轨名为模型目标，弱信号不能证明对应乐器存在。主唱 / 和声是估计轨。不同组的音轨会重叠，勿将所有轨一起叠加。 <a href="README.md">处理说明</a></footer>
+</main>
+<script>
+const report=__MANIFEST__;
+const tracks=report.tracks, player=document.getElementById('audio');
+let current=tracks.find(t=>t.id==='guitar')||tracks[0],mode='enhanced',a=0,b=45,looping=false;
+function preservePitch(){for(const name of ['preservesPitch','webkitPreservesPitch','mozPreservesPitch'])if(name in player)player[name]=true}
+player.addEventListener('ratechange',preservePitch);preservePitch();
+function time(t){return `${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toFixed(1).padStart(4,'0')}`}
+function syncLoop(){document.getElementById('loopText').textContent=`A ${time(a)} → B ${time(b)}`;document.getElementById('loop').classList.toggle('active',looping);document.getElementById('loop').textContent=looping?'关闭循环':'开启循环'}
+function load(){const pos=player.currentTime||0,playing=!player.paused;player.pause();player.src=current.audio[mode];player.onloadedmetadata=()=>{player.currentTime=Math.min(pos,player.duration-.1);player.playbackRate=Number(document.getElementById('speed').value);preservePitch();if(playing)player.play().catch(()=>{})};document.getElementById('title').textContent=current.label;document.getElementById('source').textContent=current.source;document.getElementById('group').textContent=current.group;document.getElementById('note').textContent=current.note||'增强突出乐器的可辨识频段并调整电平。切换原始版本确认弱音和尾音细节。';document.getElementById('download').href=current.audio[mode];for(const m of ['raw','enhanced'])document.getElementById(m).classList.toggle('active',mode===m);for(const btn of document.querySelectorAll('.track'))btn.classList.toggle('active',btn.dataset.id===current.id)}
+let previousGroup='';for(const t of tracks){if(t.group!==previousGroup){const h=document.createElement('div');h.className='group';h.textContent=t.group;document.getElementById('tracks').append(h);previousGroup=t.group}const btn=document.createElement('button');btn.className='track';btn.dataset.id=t.id;btn.textContent=t.label;if(t.weak){const tag=document.createElement('span');tag.className='tag';tag.textContent='弱信号';btn.append(tag)}btn.onclick=()=>{current=t;load()};document.getElementById('tracks').append(btn)}
+for(const m of ['raw','enhanced'])document.getElementById(m).onclick=()=>{mode=m;load()};
+document.getElementById('speed').onchange=e=>{player.playbackRate=Number(e.target.value);player.preservesPitch=true};
+document.getElementById('back').onclick=()=>{player.currentTime=Math.max(0,player.currentTime-3)};
+document.getElementById('markA').onclick=()=>{a=player.currentTime;if(a>=b)b=Math.min(45,a+3);syncLoop()};
+document.getElementById('markB').onclick=()=>{b=player.currentTime;if(b<=a)a=Math.max(0,b-3);syncLoop()};
+document.getElementById('loop').onclick=()=>{looping=!looping;if(looping&&(player.currentTime<a||player.currentTime>=b))player.currentTime=a;syncLoop()};
+document.getElementById('clearLoop').onclick=()=>{a=0;b=45;looping=false;syncLoop()};
+player.ontimeupdate=()=>{document.getElementById('readout').textContent=`片段 ${time(player.currentTime)} · 对应原视频 ${time(45+player.currentTime)}`;if(looping&&player.currentTime>=b)player.currentTime=a};
+player.onended=()=>{if(looping){player.currentTime=a;player.play()}};syncLoop();load();
+</script>
+</html>

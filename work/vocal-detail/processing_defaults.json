@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "vocal_strategy": "continuity_first_original_residual",
+  "playback_speed_default": 1.0,
+  "keep_original_comparison": true,
+  "local_only": true,
+  "pitch_correction": false,
+  "generative_filling": false,
+  "continuity": {
+    "enabled": true,
+    "candidate_step_seconds": 0.1,
+    "lead_to_all_max_ratio": 0.35,
+    "guide_to_all_min_ratio": 0.45,
+    "context_seconds": 2.0,
+    "neighbor_seconds": 4.0,
+    "min_candidate_seconds": 0.2,
+    "crossfade_seconds": 0.18,
+    "pitch_midi_min": 36.0,
+    "pitch_midi_max": 96.0,
+    "pitch_midi_step": 0.25,
+    "max_refill_mask": 0.85
+  },
+  "scoring": {
+    "method": "no_reference_audio_proxies_v1",
+    "range": [0, 10],
+    "decimals": 1,
+    "higher_is_better": true,
+    "subjective_or_reference_ground_truth": false
+  },
+  "visualization": {
+    "theme": "dark",
+    "renderer": "native_webgl",
+    "waveform": "real_stereo_min_max_rms",
+    "offline_assets": true,
+    "default_view": "hierarchical_primary_stems",
+    "track_spacing_zoom": true,
+    "time_alignment": "absolute_video_seconds",
+    "rotation": "360_free_orbit",
+    "style": "chromatic_single_body_stereo_envelope",
+    "shared_amplitude_power": 0.78,
+    "peak_height_world_units": 6.2,
+    "height_gain_default": 1.5,
+    "display_channels": "merged_peaks_energy_rms",
+    "audio_channels": "stereo_preserved",
+    "playback": "selected_stems_mix_with_fixed_headroom",
+    "time_axis_click": "seek_and_play",
+    "time_axis_drag": "pan_view",
+    "per_track_normalization": false,
+    "selected_track_preserves_source_color": true
+  },
+  "workflow": {
+    "initialization": "full_length_vocals_and_instruments_only",
+    "one_track_per_type": true,
+    "vocal_split_on_request": true,
+    "vocal_subtypes": ["lead", "backing", "crowd_candidate"],
+    "processing_selected_per_track": true,
+    "diagnostics_in_default_view": false
+  }
+}

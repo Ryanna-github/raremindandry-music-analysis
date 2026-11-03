@@ -1,0 +1,7 @@
+# Demucs is isolated from the specialist separator dependency set.
+demucs==4.0.1
+torch==2.8.0
+torchaudio==2.8.0
+numpy==2.0.2
+soundfile==0.13.1
+imageio-ffmpeg==0.6.0

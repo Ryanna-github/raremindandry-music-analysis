@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),range=require('./web/export_range.js');
+for(const [text,seconds] of [['01:08',68],['1:08.250',68.25],['68.25',68.25],['00:01:08.25',68.25],['01：08.250',68.25],['00:00.050',.05],[' 03:43.640 ',223.64]])assert.equal(range.parse(text),seconds,text);
+for(const text of ['',':08','1:60','1:02:60','1:60:00','-1','NaN','Infinity','1e2','1.5:02','1:','1::08','0x10','1:08junk'])assert(Number.isNaN(range.parse(text)),text);
+const bounds=[0,223.63956916099772],context={bounds,ab:[68,75],custom:['01:08.250','01:15.750']};
+assert.deepEqual(range.resolve('custom',context),[68.25,75.75]);
+assert.deepEqual(range.resolve('ab',context),[68,75]);
+assert.deepEqual(range.resolve('full',context),bounds);
+assert.equal(range.format(59.9998),'01:00.000');
+assert.equal(range.format(68.25),'01:08.250');
+assert.equal(range.resolve('custom',{...context,custom:['00:00','03:43.640']})[1],bounds[1]);
+assert.deepEqual(range.validate(68.25,68.30,bounds),[68.25,68.30]);
+for(const custom of [['75','68'],['68','68'],['68','68.001'],['-1','75'],['0','224'],['01:90','75']])assert.throws(()=>range.resolve('custom',{...context,custom}));
+assert.throws(()=>range.resolve('unknown',context));
+console.log(JSON.stringify({passed:true,minute_second_and_decimal_formats:true,millisecond_precision:true,bounds_and_order_validated:true,full_and_ab_preserved:true},null,2));

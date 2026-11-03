@@ -1,0 +1,6 @@
+# Local analysis, waveform generation and combination exports (Python 3.12).
+numpy==1.26.4
+scipy==1.15.3
+soundfile==0.13.1
+imageio-ffmpeg==0.8.0
+Pillow==13.0.0
